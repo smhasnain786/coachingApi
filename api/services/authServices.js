@@ -38,6 +38,15 @@ auth.getProfile = async(req,res,next) => {
         next(error)
     }
 }
+auth.getSubadminById = async(req,res,next) => {
+    try {
+        console.log("useriseruseruser",req.doc)
+        let get = await authModel.findsubadmin(req.doc.emailId)
+        return R(res, true, "Subadmin found successfully", get,200)
+    } catch (error) {
+        next(error)
+    }
+}
 
 
 auth.loginService = async (req,res,next) => {

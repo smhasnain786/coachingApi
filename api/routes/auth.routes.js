@@ -11,6 +11,7 @@ router.post('/login',loginValidation,authService.loginService)
 router.get('/profile',verifyToken, authService.getProfile)
 
 router.get('/get-flash-message', flashService.getInArray)
+router.get('/get-subadmin-by-email', authService.getSubadminById)
 
 
 
