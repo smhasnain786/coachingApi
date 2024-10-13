@@ -29,6 +29,7 @@ const loginSchema = mongoose.Schema(
         password: { type: String, required: true },
         // client_ip: { type: String, default: "" }, //1 verify, 2 reject, 0 pending
         userType: { type: Number, default: 0, enum: [0, 1] }, // 1 for admin
+        isGoogleUser: { type: Number, default: false }, // 1 for admin
     },
     { timestamps: true }
 );
@@ -46,6 +47,7 @@ const subadmin = mongoose.Schema({
     dor: { type: String },
     dob: { type: String },
     role:{type:String},
+    image:{type:String},
     password: { type: String, required: true },
     active: { type: String, default: 1 },
     designation: { type: Array, default: [] },
@@ -187,7 +189,7 @@ authModel.subadmin = async (data) => {
 authModel.findsubadmin = async (emailId) => {
     const sub = await db.connectDb("subadmin", subadmin);
     let val = await sub.findOne(
-        { email: emailId },
+        { _id: emailId },
         { __v: 0 }
     );
     // console.log(val);
@@ -214,8 +216,10 @@ authModel.findsubadminlist = async (type) => {
 }
 authModel.setsubadmin = async (data) => {
     const login = await db.connectDb("subadmin", subadmin);
+    console.log("______id",data);
+    
     const insdata = await login.updateOne(
-        { _id: ObjectId(data._id) },
+        { _id: data._id },
         {
             $set:data
         },
@@ -267,6 +271,19 @@ authModel.changePassword = async (userId, pass) => {
         return false;
     }
 };
+authModel.changePasswordForAdmin = async (userId, pass) => {
+    const Login = await db.connectDb("subadmins", loginSchema);
+    const passData = await Login.updateOne(
+        { _id: userId },
+        { $set: { password: pass } },
+        { runValidators: true }
+    );
+    if (passData.modifiedCount > 0) {
+        return true;
+    } else {
+        return false;
+    }
+};
 
 authModel.forgotPassword = async (emailId, pass) => {
     const Login = await db.connectDb("users", loginSchema);
@@ -298,6 +315,15 @@ authModel.forgotPasswordForAdmin = async (emailId, pass) => {
 
 authModel.getUserbyId = async (userId) => {
     const Login = await db.connectDb("users", loginSchema);
+    let val = await Login.findOne({ _id: ObjectId(userId) }, { __v: 0 });
+    if (val) {
+        console.log("resolve");
+        console.log('val: ', val);
+        return val;
+    }
+};
+authModel.getUserbyIdInSubAdmin = async (userId) => {
+    const Login = await db.connectDb("subadmins", loginSchema);
     let val = await Login.findOne({ _id: ObjectId(userId) }, { __v: 0 });
     if (val) {
         console.log("resolve");

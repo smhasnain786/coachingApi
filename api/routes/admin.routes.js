@@ -18,9 +18,11 @@ const TypingService = require("../services/typingService")
 const dataTranslate = require("../services/datatranslateService");
 const flashService = require("../services/flashMessageService");
 const PermotionPopupService = require("../services/permotionPopupService")
+const orderService = require("../services/orderService")
 const { forgotPasswordValidation } = require("../validation/admin/auth.validation")
 const { loginValidation } = require("../validation/app/auth.validation");
 const { CategoryValidation } = require("../validation/admin/category.validation")
+const verifyTokens = require("../utils/verifyAdToken");
 
 
 
@@ -46,10 +48,19 @@ router.get("/get-users",verifyToken, authService.getUsers)
 router.post("/subadmin",verifyToken,authService.addsubadmin)
 
 router.post("/get-subadmin-list",verifyToken,authService.getsubadmins)
+router.post("/changeSubAdminPass", verifyToken,authService.changePassword)
 
 router.post("/subadminstatus",verifyToken, authService.subadminstatus)
+router.get('/get-subadmin-by-email',verifyToken, authService.getSubadminById)
+router.post("/updatesudadmin",upload.single('image'),verifyToken, authService.setsudadmin)
 
-router.post("/updatesudadmin",verifyToken, authService.setsudadmin)
+
+// ORDERS ROUTES
+router.post("/add-order",verifyToken,orderService.addOrder)
+router.post("/all-order",verifyToken,orderService.getOrdersAll)
+router.post("/orders-by-user-id",verifyToken,orderService.getOrdersByUserId)
+router.post("/orders-by-subadmin-id",verifyTokens,orderService.getOrdersBySubadminId)
+router.post("/update-order-status",verifyTokens,orderService.getOrdersBySubadminId)
 
 router.post("/deletesubuser",verifyToken, authService.deletesubuser)
 

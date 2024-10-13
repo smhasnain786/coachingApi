@@ -9,9 +9,10 @@ router.post('/signup', signUpValidation,authService.signUp)
 
 router.post('/login',loginValidation,authService.loginService)
 router.get('/profile',verifyToken, authService.getProfile)
+router.post('/google-login', authService.googleLogin)
 
 router.get('/get-flash-message', flashService.getInArray)
-router.get('/get-subadmin-by-email', authService.getSubadminById)
+
 
 
 

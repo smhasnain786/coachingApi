@@ -1,3 +1,4 @@
+const { OAuth2Client } = require('google-auth-library');
 const userModel = require("../models/usermodels");
 const authModal = require("../models/authmodels");
 const validators = require("../utils/validator");
@@ -7,9 +8,74 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { getcartinfo } = require("../models/bookmodels");
 const R = require("../utils/responseHelper");
-
+const client = new OAuth2Client('939999206909-e5f3jhv92ceqp8v9iv6ul7tldbmk20ao.apps.googleusercontent.com');
 
 const auth = {};
+auth.googleLogin = async (req, res) => {
+    const token  = req.body.credential;
+console.log(token);
+    
+
+    try {
+        console.log("ticket------>");
+        // Verify the token with Google
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: '939999206909-gut16dp114reqblm0af4jqfavquf9ies.apps.googleusercontent.com'
+        });
+        console.log("ticket------>",ticket);
+        
+
+        const { email, name, picture } = ticket.getPayload();
+        console.log("----------------->");
+        // Check if user exists in your database
+        let user = await userModel.getUserByEmail(email);
+        console.log(user);
+        
+
+        if (!user) {
+            // If the user doesn't exist, create a new user
+            const data={
+                emailId:email,
+                name:name,
+                profileIcon:picture,
+                isGoogleUser:true
+            }
+            console.log('users');
+             user=await userModel.addUserGoogle(data);
+            console.log('users',user);
+           
+            
+        }
+
+
+
+        console.log('userData');
+        const userData = {
+            // userId: val["userId"],
+            userId: user._id,
+            emailId: user.emailId,
+            name: user.name,
+            lastName: user.lastName,
+            mobileNumber: user.mobileNumber,
+        };
+       
+
+     
+ 
+
+        // Generate JWT token for the user
+        userData.token = jwt.sign(userData, process.env.JWT_SECRET, { expiresIn: '7d' });
+        userData.profile = user
+
+        return R(res, true, "Login Successfully", userData,200)
+    } catch (error) {
+        return res.status(400).json({
+            status: false,
+            message: "Google token verification failed"
+        });
+    }
+};
 
 auth.addUsers = async(req,res,next) => {
     try {
@@ -20,6 +86,30 @@ auth.addUsers = async(req,res,next) => {
     }
   
 }
+auth.changePassword = async (req,res,next) => {
+    try{
+        let val = await authModel.getUserbyIdInSubAdmin(req.doc.userId);
+        const compare = await bcrypt.passwordComparision(
+            req.body.oldPassword,
+            val.password
+        );
+        console.log("comparepassword",compare)
+        if (compare) {
+            const password = await bcrypt.passwordEncryption(req.body.newPassword);
+            console.log(password);
+            
+            const insData = await authModel.changePasswordForAdmin(req.doc.userId, password);
+            if (insData) {
+                return R(res,true,"Password changed successfully",{},200)
+            }
+        } else {
+            return R(res,false,"Invalid Password!!",{},403)
+        }
+    }catch(error){
+        next(error)
+    }
+   
+};
 auth.getUsers = async(req,res,next) => {
     try {
     const get = await authModal.getUser()
@@ -40,8 +130,8 @@ auth.getProfile = async(req,res,next) => {
 }
 auth.getSubadminById = async(req,res,next) => {
     try {
-        console.log("useriseruseruser",req.doc)
-        let get = await authModel.findsubadmin(req.doc.emailId)
+        console.log("getSubadminById",req.doc)
+        let get = await authModel.findsubadmin(req.doc.userId)
         return R(res, true, "Subadmin found successfully", get,200)
     } catch (error) {
         next(error)
@@ -156,7 +246,13 @@ auth.getsubadmins = async(req,res,next) => {
     }
 }
 auth.setsudadmin = async (req,res,next) => {
-        req.body.password =  await bcrypt.passwordEncryption(req.body.password);
+        // req.body.password =  await bcrypt.passwordEncryption(req.body.password);
+        const { filename } = req.file
+        console.log('req.body------>',req.body);
+        if (filename) {
+            req.body.image = filename;
+          }
+        
     try {
         let usersatuts = await authModel.setsubadmin(req.body);
         return R(res,true,"Data updated successfully!!",{},200)
@@ -212,6 +308,7 @@ auth.forgotPassword = async (req,res,next) => {
     }
    
 };
+
 
 
 
