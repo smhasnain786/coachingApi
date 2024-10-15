@@ -203,6 +203,17 @@ BookModel.getBookFiles = async(req,res,next)=>{
     }
    
 }
+BookModel.getBookFilesByFileId = async(req,res,next)=>{
+    try {
+        let get = await bookModels.getBookFilesByFile(req.body)
+        console.log('req.body',req.body);
+        
+        return R(res,true,"Data found successfully!!",get,200)
+    } catch (error) {
+        next(error)
+    }
+   
+}
 BookModel.updateBookFiles = async(req,res,next)=>{
     try {
         let details = {

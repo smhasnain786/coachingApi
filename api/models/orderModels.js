@@ -11,24 +11,25 @@ OrderModel = {}
 const orderSchema = new mongoose.Schema({
     userId: {
       type: String,
-     
       required: true,
     },
     vendorId: {
       type: String,
-      ref: 'subadmins',
-      required: true,
     },
     products: [{
       productId: {
         type: String,
-        ref: 'Product',
-        required: true,
+      
       },
-      price: {
-        type: Number,
-        required: true,
-      }
+      vendorId: {
+        type: String,
+      
+      },
+      bookId: {
+        type: String,
+      
+      },
+      
     }],
     totalAmount: {
       type: Number,
@@ -36,8 +37,8 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
       type: String,
-      enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
-      default: 'pending',
+      enum: ['pending', 'processing', 'shipped', 'paid', 'cancelled'],
+      default: 'paid',
     },
     createdAt: {
       type: Date,

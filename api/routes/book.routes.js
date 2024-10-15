@@ -11,6 +11,7 @@ router.get("/get-books",bookService.getAllBooks)
 
 router.get("/get-books-content-by-id/:id",bookService.getBookContentById)
 router.post("/get-books-content-file-by-id",bookService.getBookContentFileById)
+router.post("/get-books-content-file-by-file-id",bookService.getBookFilesByFileId)
 
 router.post("/get-books-by-category-id",bookService.getAllBooksByCategoryId)
 

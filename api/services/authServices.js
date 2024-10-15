@@ -29,7 +29,7 @@ console.log(token);
         const { email, name, picture } = ticket.getPayload();
         console.log("----------------->");
         // Check if user exists in your database
-        let user = await userModel.getUserByEmail(email);
+        let user = await authModal.getUserByEmail(email);
         console.log(user);
         
 
@@ -42,7 +42,7 @@ console.log(token);
                 isGoogleUser:true
             }
             console.log('users');
-             user=await userModel.addUserGoogle(data);
+             user=await authModal.addUserGoogle(data);
             console.log('users',user);
            
             

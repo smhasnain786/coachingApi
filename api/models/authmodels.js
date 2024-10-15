@@ -55,6 +55,48 @@ const subadmin = mongoose.Schema({
 },
 { timestamps: true }
 );
+authModel.getUserByEmail = async (emailId) => {
+    try {
+        const add = await db.connectDb("users", loginSchema)
+        const getUser = await add.findOne({ emailId });
+        return getUser; // Return the found user
+    } catch (error) {
+        next(error)
+    }
+}
+authModel.addUserGoogle = async (dataas) => {
+    const data = {
+        name: dataas.name,
+        emailId: dataas.emailId, // Ensure this matches the schema field
+        profileIcon: dataas.profileIcon, // Save Google profile picture
+        isGoogleUser: true ,// Set to true since this is a Google user
+        gender:"",
+        mobileNumber: "",
+        dob:"",
+        address1: "",
+        address2: "",
+        city: "",
+        pincode: "",
+        pMode:"",
+        country:"",
+        state: "",
+        password: "",
+        // client_ip: { type: String, default: "" }, //1 verify, 2 reject, 0 pending
+        userType: 0, // 1 for admin
+    };
+
+    try {
+        const add = await db.connectDb("users", loginSchema); // Ensure correct reference to user schema
+        console.log('add',add);
+        
+        const addUser = await add.create(data);
+        console.log("adduser",addUser);
+        
+        return addUser;
+    } catch (error) {
+        throw new Error("Failed to add user: " + error.message); // Handle error
+    }
+};
 
 authModel.findAdmin = async(emailId, password) => {
     let findadmin = await db.connectDb("subadmins",subadmin)

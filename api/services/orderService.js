@@ -1,51 +1,94 @@
+const Razorpay = require('razorpay')
+// const { default: orders } = require("razorpay/dist/types/orders");
 const orderModels = require("../models/orderModels")
+const bookService=require("../services/bookService")
 const R = require("../utils/responseHelper")
 const IP = require('ip');
 const OrderModel = {}
 
 
 
-OrderModel.addOrder = async(req,res,next)=>{
-    const {userId} = req.doc
- 
+OrderModel.createOrder = async (req, res, next) => {
+    const { userId } = req.doc
+
 
     try {
         req.body.userId = userId
-        let add = await orderModels.createOrder(req.body)
-        console.log(add);
-        
-        return R(res,true,"Data added successfully!!",{},200)
+        const razorpay = new Razorpay({
+            key_id: "rzp_test_fOGZE2lz3ypiZ6",
+            key_secret: "ZmsL7s1Fl8JytT8lkfyDMUU4"
+        })
+        const options = {
+            amount: req.body.amount,
+            currency: "INR",
+            receipt: "order_rcptid_11",
+            payment_capture: 1,
+        }
+        const response = await razorpay.orders.create(options)
+        res.json({
+            userId: userId,
+            order_id: response.id,
+            currency: response.currency,
+            amount: response.amount
+        })
     } catch (error) {
         next(error)
     }
-   
+
 }
-OrderModel.getOrdersAll = async(req,res,next)=>{
+OrderModel.addOrder = async (req, res, next) => {
+    const { userId } = req.doc
+
+
+    try {
+        req.body.userId = userId
+        const order = {}
+        order.totalAmount = req.body.amount
+        order.userId = userId
+        order.vendorId = req.body.vendorId
+        const selectedProducts = req.body.products.map(product => ({
+            productId: product.fileId,
+            bookId: product.bookId,
+            vendorId: product.bookdata[0].userId
+        }));
+        console.log('selectedProducts',selectedProducts);
+
+        order.products = selectedProducts
+        let add = await orderModels.createOrder(order)
+        console.log(add);
+
+        return R(res, true, "Data added successfully!!", {}, 200)
+    } catch (error) {
+        next(error)
+    }
+
+}
+OrderModel.getOrdersAll = async (req, res, next) => {
     try {
         let add = await orderModels.allOrders(req.doc)
-        return R(res,true,"Data found successfully!!",add,200)
+        return R(res, true, "Data found successfully!!", add, 200)
     } catch (error) {
         next(error)
     }
-   
+
 }
-OrderModel.getOrdersByUserId= async(req,res,next)=>{
+OrderModel.getOrdersByUserId = async (req, res, next) => {
     try {
         let add = await orderModels.ordersByUserId(req.doc)
-        return R(res,true,"Data found successfully!!",add,200)
+        return R(res, true, "Data found successfully!!", add, 200)
     } catch (error) {
         next(error)
     }
-   
+
 }
-OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
+OrderModel.getOrdersBySubadminId = async (req, res, next) => {
     try {
         let add = await orderModels.ordersBySubadminId(req.doc)
-        return R(res,true,"Data found successfully!!",add,200)
+        return R(res, true, "Data found successfully!!", add, 200)
     } catch (error) {
         next(error)
     }
-   
+
 }
 // BookModel.updatecategoryOfBookById = async(req,res,next)=>{
 //     try {
@@ -55,7 +98,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.deletecategoryOfBookById = async(req,res,next)=>{
 //     const {id} = req.body
@@ -65,7 +108,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.changeCategoryStatus = async(req,res,next)=>{
 //     try {
@@ -74,7 +117,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
- 
+
 // }
 // BookModel.changeBookStatus = async(req,res,next)=>{
 //     try {
@@ -83,7 +126,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.changePosterStatus = async(req,res,next)=>{
 //     try {
@@ -92,7 +135,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.addBookDetails = async(req,res,next)=>{
 //     try {
@@ -135,7 +178,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.updateBookDetails = async(req,res,next)=>{
 //     try {
@@ -180,7 +223,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.deleteBookDetails = async(req,res,next)=>{
 //     try {
@@ -190,8 +233,8 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
-    
+
+
 // }
 
 // BookModel.addBookFiles = async(req,res,next)=>{
@@ -214,7 +257,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.getBookFiles = async(req,res,next)=>{
 //     try {
@@ -223,7 +266,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.updateBookFiles = async(req,res,next)=>{
 //     try {
@@ -243,7 +286,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.removeBookFiles = async(req,res,next)=>{
 //     try {
@@ -253,7 +296,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 
 // BookModel.addPoster = async(req,res,next)=>{
@@ -271,19 +314,19 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 
 // BookModel.getPoster = async(req,res,next)=>{
 //     try {
 //         let get = await bookModels.getPosters(req.doc)
 //         return R(res,true,"Data found successfully!!",get,200)
-    
+
 //     } catch (error) {
 //         next(error)
 //     }
 // }
-   
+
 
 // BookModel.updatePoster = async(req,res,next)=>{
 //     try {
@@ -302,7 +345,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.deletePoster = async(req,res,next)=>{
 //     try {
@@ -312,7 +355,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 
 // BookModel.getAllCategory = async(req,res,next) => {
@@ -322,7 +365,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getAllBooks = async(req,res,next) => {
 //     try {
@@ -331,7 +374,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getBookContentById = async(req,res,next) => {
 //     try {
@@ -356,7 +399,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.getAllPosters = async(req,res,next) => {
 //     try {
@@ -365,7 +408,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.addNewsLetter = async(req,res,next) => {
 //     try {
@@ -398,7 +441,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 
 // BookModel.changeStatus = async(req,res,next)=>{
@@ -408,7 +451,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.addBookToCart = async(req,res,next)=>{
 //     try{
@@ -425,7 +468,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     }catch(error){
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.getBookFromCart = async(req,res,next)=>{
 //     try{
@@ -435,7 +478,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     }catch(error){
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getCartInfo = async(req,res,next)=>{
 //     try {
@@ -445,7 +488,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getCartInfoByUserId = async(req,res,next)=>{
 //     try {
@@ -454,7 +497,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getBookDetailsById = async(req,res,next)=>{
 //     try {
@@ -463,7 +506,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
- 
+
 // }
 // BookModel.getBookfromCartByUserId = async(req,res,next)=>{
 //     try{
@@ -472,7 +515,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     }catch(error){
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.removeItemFromCart = async(req,res,next)=>{
 //     try {
@@ -481,7 +524,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getAllCartDetails = async(req,res,next)=>{
 //     try {
@@ -499,7 +542,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //             icon:req.file.filename
 //         }
 //         let findIdTitleExist = await bookModels.findIfTitleExist(data.title)
-    
+
 //         if(findIdTitleExist){
 //               return R(res,false,"Title already exists!!",{},403)
 //         }
@@ -508,7 +551,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.getTitlesImage = async(req,res,next)=>{
 //     try {
@@ -517,7 +560,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-   
+
 // }
 // BookModel.updateTitlesImage = async(req,res,next)=>{
 //     try {
@@ -535,7 +578,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.deleteTitlesImage = async(req,res,next)=>{
 //     try {
@@ -545,7 +588,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.addPromotionAndOffer = async(req,res,next)=>{
 //     try {
@@ -559,7 +602,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.getPromotionAndOffer = async(req,res,next)=>{
 //     try {
@@ -568,7 +611,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.updatePromotionAndOfferById = async(req,res,next)=>{
 //     try {
@@ -581,7 +624,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //         else{
 //             data.icon = req.body.promotionIcon
 //         }
-    
+
 //         let update = await bookModels.updatepromotionandofferbyid(req.body._id,data)
 //         return R(res,true,"Data updated successfully!!",{},200)
 //     } catch (error) {
@@ -596,7 +639,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-    
+
 // }
 // BookModel.addAdminInformation = async(req,res,next)=>{
 //     try {
@@ -621,7 +664,7 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //         next(error)
 //     }
-  
+
 // }
 // BookModel.updateAdminInformation = async(req,res,next)=>{
 //     try {
@@ -645,6 +688,6 @@ OrderModel.getOrdersBySubadminId= async(req,res,next)=>{
 //     } catch (error) {
 //      next(error)   
 //     }
- 
+
 // }
 module.exports = OrderModel

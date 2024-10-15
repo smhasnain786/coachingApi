@@ -6,6 +6,7 @@ const verifyTokens = require("../utils/verifyAdToken");
 
 
 
+router.post("/create-order",verifyToken,orderService.createOrder)
 router.post("/add-order",verifyToken,orderService.addOrder)
 router.post("/all-order",verifyToken,orderService.getOrdersAll)
 router.post("/orders-by-user-id",verifyToken,orderService.getOrdersByUserId)
