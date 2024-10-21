@@ -22,7 +22,7 @@ supportModel = {}
 
 supportModel.addsupport = async(data) => {
     try{
-        let support =await db.connectDb("support",supportSchema);
+        let support =await db.connectDb("supports",supportSchema);
         let addsupport = await support.create(data)
         if(addsupport){
             return true

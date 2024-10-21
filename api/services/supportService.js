@@ -5,6 +5,8 @@ const supportService = {}
 
 supportService.addSupport = async(req,res,next)=>{
     try{
+        console.log("req.body----->",req.body);
+        
         let add = await supportModel.addsupport(req.body)
         return R(res,true,"Form submitted successfully!!",{},200)
     }catch(error){

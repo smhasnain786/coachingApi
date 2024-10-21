@@ -24,6 +24,8 @@ const design = require("./routes/design.routes")
 const dataTranslate = require("./routes/datatranslate.routes")
 const previousYearPaper = require("./routes/previousYearPaper.routes")
 const Orders = require("./routes/order.routes")
+const Notice = require("./routes/notice.routes")
+const Contact = require("./routes/contact.routes")
 
 
 
@@ -55,6 +57,8 @@ app.use("/design",design)
 app.use("/datatranslate",dataTranslate)
 app.use("/paper",previousYearPaper)
 app.use("/order",Orders)
+app.use("/notice",Notice)
+app.use("/contact",Contact)
 
 
 const server = new http.createServer({}, app);

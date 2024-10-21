@@ -114,6 +114,7 @@ currentAffairs.findfiles = async(data)=> {
                   range: "$$doc.range",
                   file:"$$doc.file",
                   date: "$$doc.date",
+                  plan:"$$doc.plan",
                   createdAt: "$$doc.createdAt",
                   updatedAt: "$$doc.updatedAt",
                   __v: "$$doc.__v"

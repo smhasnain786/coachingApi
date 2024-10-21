@@ -90,7 +90,7 @@ const bookSchema = mongoose.Schema({
     sellingPrice: { type: Number },
     discount: { type: Number },
     features: { type: String },
-    isActive: { type: Boolean, default: false },
+    isActive: { type: Boolean, default: true },
     date: { type: Date }
 })
 
@@ -133,6 +133,66 @@ BookModel.getCategory = async (data) => {
         return err
     }
 }
+BookModel.getAuthorBooks = async (data) => {
+    try {
+        let category = await db.connectDb("bookdetails", bookSchema);
+        if (data.author != "") {
+            let getCategory = await category.find({ author: data.author,itemType:'ebook' })
+            return getCategory
+        }
+        else {
+            let getCategory = await category.find()
+            return getCategory
+        }
+
+    }
+    catch (err) {
+        return err
+    }
+}
+BookModel.getBooksByType = async (data) => {
+    try {
+        let category = await db.connectDb("bookdetails", bookSchema);
+
+        let getCategory = await category.find({ type: data.type,itemType:'ebook',isActive:true })
+        return getCategory
+
+
+
+    }
+    catch (err) {
+        return err
+    }
+}
+BookModel.getBooksByLang = async (data) => {
+    try {
+        let category = await db.connectDb("bookdetails", bookSchema);
+
+        let getCategory = await category.find({ language: data.language,itemType:'ebook',isActive:true })
+        return getCategory
+
+
+
+    }
+    catch (err) {
+        return err
+    }
+}
+BookModel.getBooksByFormat = async (data) => {
+    try {
+        let category = await db.connectDb("bookdetails", bookSchema);
+
+        let getCategory = await category.find({ itemType: data.itemType,itemType:'ebook',isActive:true })
+        return getCategory
+
+
+
+    }
+    catch (err) {
+        return err
+    }
+}
+
 BookModel.updateCategory = async (id, categoryName) => {
     try {
         let category = await db.connectDb("categories", categorySchema);
@@ -321,8 +381,8 @@ BookModel.getBookFiles = async (data) => {
 }
 BookModel.getBookFilesByFile = async (data) => {
     const bookFiles = await db.connectDb("bookfiles", bookFilesSchema);
-    console.log('data.id',data.id);
-    
+    console.log('data.id', data.id);
+
     let insData = await bookFiles.find({ _id: data.id });
 
 
@@ -639,7 +699,7 @@ BookModel.getallbooksbycategoryId = async (data) => {
             {
                 $match: {
                     categoryId: data.categoryId,
-                    itemType: "book",
+                    itemType: "ebook",
                     isActive: true
                 }
             },
@@ -860,6 +920,7 @@ BookModel.getbookdetailsbyid = async (id) => {
                     "itemType": 1,
                     "categoryId": 1,
                     "userId": 1,
+                    "samplePdf": 1,
                     bookFilesData: {
                         $map: {
                             input: {

@@ -457,6 +457,47 @@ BookModel.getBookDetailsById = async(req,res,next)=>{
 BookModel.getBookfromCartByUserId = async(req,res,next)=>{
     try{
         let get = await bookModels.getbookfromcartbyuserId(req.doc.userId)
+        
+        return R(res,true,"Data found successfully",get,200)
+    }catch(error){
+        next(error)
+    }
+   
+}
+BookModel.getAuthorBooks = async(req,res,next)=>{
+    try{
+        let get = await bookModels.getAuthorBooks(req.body)
+        
+        return R(res,true,"Data found successfully",get,200)
+    }catch(error){
+        next(error)
+    }
+   
+}
+BookModel.getBooksByLang = async(req,res,next)=>{
+    try{
+        let get = await bookModels.getBooksByLang(req.body)
+        
+        return R(res,true,"Data found successfully",get,200)
+    }catch(error){
+        next(error)
+    }
+   
+}
+BookModel.getBooksByType = async(req,res,next)=>{
+    try{
+        let get = await bookModels.getBooksByType(req.body)
+        
+        return R(res,true,"Data found successfully",get,200)
+    }catch(error){
+        next(error)
+    }
+   
+}
+BookModel.getBooksByFormat = async(req,res,next)=>{
+    try{
+        let get = await bookModels.getBooksByFormat(req.body)
+        
         return R(res,true,"Data found successfully",get,200)
     }catch(error){
         next(error)

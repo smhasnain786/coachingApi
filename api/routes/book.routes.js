@@ -8,6 +8,11 @@ const PermotionPopupService = require("../services/permotionPopupService")
 router.get("/get-category",bookService.getAllCategory)
 
 router.get("/get-books",bookService.getAllBooks)
+router.post("/get-books-by-author-id",bookService.getAuthorBooks)
+
+router.post("/get-books-by-lang",bookService.getBooksByLang)
+router.post("/get-books-by-type",bookService.getBooksByType)
+router.post("/get-books-by-format",bookService.getBooksByFormat)
 
 router.get("/get-books-content-by-id/:id",bookService.getBookContentById)
 router.post("/get-books-content-file-by-id",bookService.getBookContentFileById)
